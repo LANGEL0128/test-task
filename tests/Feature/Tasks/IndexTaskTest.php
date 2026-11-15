@@ -101,6 +101,30 @@ class IndexTaskTest extends TestCase
             ->assertJsonCount(0, 'data');
     }
 
+    #[\PHPUnit\Framework\Attributes\DataProvider('filtrosInvalidos')]
+    public function test_filtros_invalidos_devuelven_422(string $query, string $campo): void
+    {
+        $this->getJson(self::URL.'?'.$query)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([$campo]);
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public static function filtrosInvalidos(): array
+    {
+        return [
+            'status desconocido' => ['status=terminada', 'status'],
+            'assigned_to no numerico' => ['assigned_to=abc', 'assigned_to'],
+            'assigned_to inexistente' => ['assigned_to=99999', 'assigned_to'],
+            'per_page cero' => ['per_page=0', 'per_page'],
+            'per_page mayor a 100' => ['per_page=101', 'per_page'],
+            'per_page no numerico' => ['per_page=muchos', 'per_page'],
+            'page cero' => ['page=0', 'page'],
+        ];
+    }
+
     public function test_sin_resultados_devuelve_200_con_data_vacia(): void
     {
         $this->getJson(self::URL)

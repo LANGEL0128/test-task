@@ -2,7 +2,18 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TaskController;
+use App\Models\Task;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
+// Un id no numérico es una petición incorrecta (400); uno numérico inexistente es 404.
+Route::bind('task', function (string $value) {
+    if (! ctype_digit($value)) {
+        throw new BadRequestHttpException('El identificador de la tarea debe ser numérico.');
+    }
+
+    return Task::findOrFail($value);
+});
 
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);

@@ -3,27 +3,27 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexTaskRequest;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class TaskController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexTaskRequest $request): AnonymousResourceCollection
     {
-        $perPage = min(max((int) $request->query('per_page', 15), 1), 100);
+        $filters = $request->validated();
 
         $tasks = Task::query()
             ->with('assignee')
-            ->when($request->filled('status'), fn ($q) => $q->status($request->query('status')))
-            ->when($request->filled('assigned_to'), fn ($q) => $q->assignedTo($request->query('assigned_to')))
+            ->when(isset($filters['status']), fn ($q) => $q->status($filters['status']))
+            ->when(isset($filters['assigned_to']), fn ($q) => $q->assignedTo($filters['assigned_to']))
             ->orderByDesc('id')
-            ->paginate($perPage)
+            ->paginate((int) ($filters['per_page'] ?? 15))
             ->withQueryString();
 
         return TaskResource::collection($tasks);

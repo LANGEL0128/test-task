@@ -32,4 +32,18 @@ class ShowTaskTest extends TestCase
             ->assertJsonPath('data.assignee.id', $user->id)
             ->assertJsonPath('data.assignee.name', 'Ana');
     }
+
+    public function test_id_no_numerico_devuelve_400(): void
+    {
+        $this->getJson('/api/tasks/abc')
+            ->assertStatus(400)
+            ->assertJsonPath('message', 'El identificador de la tarea debe ser numérico.');
+    }
+
+    public function test_tarea_inexistente_devuelve_404_en_json(): void
+    {
+        $this->getJson('/api/tasks/99999')
+            ->assertNotFound()
+            ->assertJsonPath('message', 'Recurso no encontrado.');
+    }
 }
