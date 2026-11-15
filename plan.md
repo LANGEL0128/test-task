@@ -248,6 +248,38 @@ Secciones requeridas:
 - Ejecutar toda la suite de tests y verificar manualmente con Swagger.
 - Commit y push a `main` en https://github.com/LANGEL0128/test-task.
 
+### Fase 11: Endurecimiento de seguridad (opcional, tiempo libre)
+
+> **Alcance:** esta fase **no forma parte de la entrega de la prueba técnica**. Es trabajo que haría en mi tiempo libre, con más tiempo del que da la prueba. Se deja documentada para mostrar que el análisis de seguridad se hizo y qué se priorizaría. Está mencionada en la sección "Qué haría con más tiempo" del README.
+
+Origen: análisis de seguridad hecho tras migrar los ids a UUID. Dos hallazgos se confirmaron con pruebas reales (login sin límite de intentos y error 500 con descripciones muy largas).
+
+#### 11.1 Prioridad alta (lo primero que haría)
+1. **Datos personales en rutas públicas.** `GET /api/tasks` y `GET /api/tasks/{id}` devuelven nombre y email del responsable sin token. Acción: `TaskResource` solo expone `id` y `name` del responsable (sin `email`) y se añade un test que lo verifique. Decisión de producto pendiente: si el listado debe seguir siendo público.
+2. **Sin límite de intentos en el login.** Verificado: 20 contraseñas erróneas seguidas dan 401 sin bloqueo. Acción: `RateLimiter` en `login` (p. ej. 5 intentos por minuto por email + IP, respuesta `429`) y `throttle:api` general para el resto. Tests: el intento 6 devuelve `429`, y un login correcto no se ve afectado antes del límite.
+3. **Credenciales por defecto en el seeder.** `admin@admin.com` / `superadmin` se crean en cualquier entorno. Acción: leer email y contraseña de variables de entorno (`ADMIN_EMAIL`, `ADMIN_PASSWORD`), y no sembrar el usuario si `APP_ENV=production` sin contraseña definida. Los valores de la prueba se mantienen solo para desarrollo, documentados en el README.
+4. **`APP_DEBUG=true` en `.env.example`.** Con debug activo los errores exponen SQL, host, nombre de la BD y rutas. Acción: `APP_DEBUG=false` en `.env.example` y nota en el README para activarlo solo en local.
+5. **Error 500 con textos muy largos.** Verificado: una `description` de 70 000 caracteres rompe MySQL (`Data too long`) y devuelve 500. Acción: `max` en `description` (p. ej. 5000) en `StoreTaskRequest` y `UpdateTaskRequest`, y test que devuelva `422` en lugar de `500`.
+
+#### 11.2 Prioridad media
+6. **Refresh de 14 días.** Un token robado puede renovarse 2 semanas. Acción: reducir `JWT_REFRESH_TTL` (p. ej. 1 día) y valorar rotación.
+7. **Cabeceras de seguridad, HTTPS y CORS.** Añadir `X-Content-Type-Options`, `Strict-Transport-Security`, `X-Frame-Options`; forzar HTTPS en producción; restringir `allowed_origins` en lugar de `*`.
+8. **Swagger público en producción.** Desactivar o proteger `/api/documentation` fuera de local.
+9. **Lista negra de tokens en caché.** Un `cache:clear` reactiva tokens revocados hasta que expiren. Acción: usar un almacén persistente y no limpiar la caché de la lista negra.
+
+#### 11.3 Prioridad baja
+10. Igualar los tiempos de respuesta del login para que no se pueda inferir si un email existe.
+11. Valorar UUID v4 si no se quiere exponer la fecha de creación (v7 la incluye); implicaría ordenar por `created_at` y no por `id`.
+12. Registro de auditoría (quién crea, edita o borra tareas) y roles/permisos más granulares.
+
+#### Criterios de aceptación de la fase
+- [ ] Ninguna respuesta pública expone emails.
+- [ ] El login responde `429` tras superar el límite.
+- [ ] El seeder no crea credenciales débiles en producción.
+- [ ] Con `APP_DEBUG=false` los errores no muestran SQL ni rutas.
+- [ ] Descripciones demasiado largas devuelven `422`.
+- [ ] Todos los tests nuevos y los 84 existentes pasan.
+
 ## 5. Estructura de archivos prevista
 
 ```

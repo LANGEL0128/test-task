@@ -130,6 +130,19 @@ Todas las respuestas de `/api/*` son JSON con `{"message": "..."}` (y `errors` e
 
 ## Qué haría con más tiempo
 
+### Seguridad (Fase 11 de [plan.md](plan.md), no incluida en esta entrega)
+
+Es trabajo que haría en mi tiempo libre. Tras revisar la API detecté estas limitaciones, que conozco y no están corregidas en esta entrega:
+
+- **Datos personales en rutas públicas:** el listado y el detalle de tareas devuelven nombre y email del responsable sin token. Dejaría solo `id` y `name`.
+- **Sin límite de intentos en el login** (comprobado: 20 intentos fallidos seguidos sin bloqueo). Añadiría rate limiting con respuesta `429`.
+- **Credenciales del administrador fijas en el seeder** (`admin@admin.com` / `superadmin`): las leería de variables de entorno y no las crearía en producción.
+- **`APP_DEBUG=true` en `.env.example`:** con debug activo los errores exponen SQL y rutas internas. Debe ser `false` fuera de local.
+- **`description` sin longitud máxima:** un texto de más de 65 535 caracteres devuelve 500 en lugar de 422.
+- Además: reducir la ventana de refresh del JWT (hoy 14 días), cabeceras de seguridad y HTTPS, CORS restringido, Swagger solo en local y una lista negra de tokens en almacenamiento persistente.
+
+### Otras mejoras
+
 - Traducir los mensajes de validación (422) al español; hoy salen en inglés (los demás mensajes están en español).
 - Rate limiting en el login (protección contra fuerza bruta) y rotación/refresh de tokens más estricta.
 - Más filtros y orden en el listado: rango de fechas límite, búsqueda por título, `sort`.
