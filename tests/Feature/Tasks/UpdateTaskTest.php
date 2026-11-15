@@ -5,6 +5,7 @@ namespace Tests\Feature\Tasks;
 use App\Models\Task;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\Concerns\CreatesUsers;
 use Tests\Concerns\SendsRawJson;
 use Tests\TestCase;
@@ -108,7 +109,7 @@ class UpdateTaskTest extends TestCase
 
     public function test_tarea_inexistente_devuelve_404(): void
     {
-        $this->putJson('/api/tasks/99999', ['title' => 'X'], $this->bearer($this->superAdmin()))
+        $this->putJson('/api/tasks/'.(string) Str::uuid(), ['title' => 'X'], $this->bearer($this->superAdmin()))
             ->assertNotFound()
             ->assertJsonPath('message', 'Recurso no encontrado.');
     }
@@ -121,7 +122,7 @@ class UpdateTaskTest extends TestCase
         $this->putJson('/api/tasks/'.$task->id, [
             'title' => '',
             'status' => 'terminada',
-            'assigned_to' => 99999,
+            'assigned_to' => (string) Str::uuid(),
             'due_date' => 'mañana',
         ], $this->bearer($admin))
             ->assertStatus(422)

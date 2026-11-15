@@ -21,7 +21,7 @@ class IndexTaskRequest extends FormRequest
     {
         return [
             'status' => ['nullable', Rule::enum(TaskStatus::class)],
-            'assigned_to' => ['nullable', 'integer', 'exists:users,id'],
+            'assigned_to' => ['nullable', 'uuid', 'exists:users,id'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
         ];

@@ -4,6 +4,7 @@ namespace Tests\Feature\Tasks;
 
 use App\Models\Task;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\Concerns\CreatesUsers;
 use Tests\Concerns\SendsRawJson;
 use Tests\TestCase;
@@ -103,7 +104,7 @@ class StoreTaskTest extends TestCase
         $this->postJson(self::URL, [
             'title' => 'Ok',
             'status' => 'terminada',
-            'assigned_to' => 99999,
+            'assigned_to' => (string) Str::uuid(),
             'due_date' => '31/12/2026',
         ], $this->bearer($this->superAdmin()))
             ->assertStatus(422)
@@ -111,6 +112,13 @@ class StoreTaskTest extends TestCase
             ->assertJsonMissingValidationErrors(['title']);
 
         $this->assertSame(0, Task::count());
+    }
+
+    public function test_assigned_to_que_no_es_uuid_devuelve_422(): void
+    {
+        $this->postJson(self::URL, ['title' => 'Ok', 'assigned_to' => '1'], $this->bearer($this->superAdmin()))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['assigned_to']);
     }
 
     public function test_due_date_con_fecha_inexistente_devuelve_422(): void

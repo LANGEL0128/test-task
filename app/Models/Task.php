@@ -6,6 +6,7 @@ use App\Enums\TaskStatus;
 use Database\Factories\TaskFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Task extends Model
 {
     /** @use HasFactory<TaskFactory> */
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     /**
      * Valores por defecto (para que la respuesta de crear ya incluya el estado).
@@ -51,7 +52,7 @@ class Task extends Model
         return $query->where('status', $status instanceof TaskStatus ? $status->value : $status);
     }
 
-    public function scopeAssignedTo(Builder $query, int|string $userId): Builder
+    public function scopeAssignedTo(Builder $query, string $userId): Builder
     {
         return $query->where('assigned_to', $userId);
     }

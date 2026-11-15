@@ -5,6 +5,7 @@ namespace Tests\Feature\Tasks;
 use App\Models\Task;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\Concerns\CreatesUsers;
 use Tests\TestCase;
 
@@ -64,7 +65,7 @@ class DestroyTaskTest extends TestCase
     {
         $this->seed(RoleSeeder::class);
 
-        $this->deleteJson('/api/tasks/99999', [], $this->bearer($this->normalUser()))
+        $this->deleteJson('/api/tasks/'.(string) Str::uuid(), [], $this->bearer($this->normalUser()))
             ->assertForbidden();
 
         $this->resetAuth();
@@ -74,7 +75,7 @@ class DestroyTaskTest extends TestCase
 
     public function test_tarea_inexistente_devuelve_404(): void
     {
-        $this->deleteJson('/api/tasks/99999', [], $this->bearer($this->superAdmin()))
+        $this->deleteJson('/api/tasks/'.(string) Str::uuid(), [], $this->bearer($this->superAdmin()))
             ->assertNotFound();
     }
 

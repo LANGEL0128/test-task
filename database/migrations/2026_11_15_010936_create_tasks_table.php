@@ -10,11 +10,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tasks', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('status')->default(TaskStatus::Pendiente->value)->index();
-            $table->foreignId('assigned_to')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignUuid('assigned_to')->nullable()->constrained('users')->nullOnDelete();
             $table->date('due_date')->nullable();
             $table->timestamps();
         });

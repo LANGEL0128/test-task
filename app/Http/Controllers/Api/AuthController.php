@@ -20,7 +20,7 @@ use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 #[OA\Schema(
     schema: 'User',
     properties: [
-        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'id', type: 'string', format: 'uuid', example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b'),
         new OA\Property(property: 'name', type: 'string', example: 'Super Admin'),
         new OA\Property(property: 'email', type: 'string', format: 'email', example: 'admin@admin.com'),
         new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'), example: ['super_admin']),

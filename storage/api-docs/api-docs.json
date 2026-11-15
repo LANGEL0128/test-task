@@ -226,11 +226,11 @@
                     {
                         "name": "assigned_to",
                         "in": "query",
-                        "description": "Filtrar por id del responsable",
+                        "description": "Filtrar por UUID del responsable",
                         "required": false,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "format": "uuid"
                         }
                     },
                     {
@@ -315,9 +315,10 @@
                                         ]
                                     },
                                     "assigned_to": {
-                                        "description": "Id del usuario responsable",
-                                        "type": "integer",
-                                        "example": 1,
+                                        "description": "UUID del usuario responsable",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b",
                                         "nullable": true
                                     },
                                     "due_date": {
@@ -408,11 +409,12 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Id de la tarea",
+                        "description": "UUID de la tarea",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
                         }
                     }
                 ],
@@ -433,7 +435,7 @@
                         }
                     },
                     "400": {
-                        "description": "Id no numérico",
+                        "description": "Id que no es un UUID válido",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -464,11 +466,12 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Id de la tarea",
+                        "description": "UUID de la tarea",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
                         }
                     }
                 ],
@@ -497,8 +500,9 @@
                                         ]
                                     },
                                     "assigned_to": {
-                                        "type": "integer",
-                                        "example": 1,
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b",
                                         "nullable": true
                                     },
                                     "due_date": {
@@ -530,7 +534,7 @@
                         }
                     },
                     "400": {
-                        "description": "Id no numérico o JSON mal formado",
+                        "description": "Id que no es un UUID válido o JSON mal formado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -596,11 +600,12 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Id de la tarea",
+                        "description": "UUID de la tarea",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
                         }
                     }
                 ],
@@ -609,7 +614,7 @@
                         "description": "Tarea borrada (sin contenido)"
                     },
                     "400": {
-                        "description": "Id no numérico",
+                        "description": "Id que no es un UUID válido",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -665,11 +670,12 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Id de la tarea",
+                        "description": "UUID de la tarea",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
                         }
                     }
                 ],
@@ -697,7 +703,8 @@
                                         ]
                                     },
                                     "assigned_to": {
-                                        "type": "integer",
+                                        "type": "string",
+                                        "format": "uuid",
                                         "nullable": true
                                     },
                                     "due_date": {
@@ -728,7 +735,7 @@
                         }
                     },
                     "400": {
-                        "description": "Id no numérico o JSON mal formado",
+                        "description": "Id que no es un UUID válido o JSON mal formado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -809,8 +816,9 @@
             "User": {
                 "properties": {
                     "id": {
-                        "type": "integer",
-                        "example": 1
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
                     },
                     "name": {
                         "type": "string",
@@ -861,8 +869,9 @@
             "Assignee": {
                 "properties": {
                     "id": {
-                        "type": "integer",
-                        "example": 1
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
                     },
                     "name": {
                         "type": "string",
@@ -880,8 +889,9 @@
             "Task": {
                 "properties": {
                     "id": {
-                        "type": "integer",
-                        "example": 1
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
                     },
                     "title": {
                         "type": "string",
@@ -902,8 +912,9 @@
                         ]
                     },
                     "assigned_to": {
-                        "type": "integer",
-                        "example": 1,
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b",
                         "nullable": true
                     },
                     "assignee": {

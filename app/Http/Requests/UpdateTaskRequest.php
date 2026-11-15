@@ -23,7 +23,7 @@ class UpdateTaskRequest extends FormRequest
             'title' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['sometimes', 'nullable', 'string'],
             'status' => ['sometimes', 'required', Rule::enum(TaskStatus::class)],
-            'assigned_to' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
+            'assigned_to' => ['sometimes', 'nullable', 'uuid', 'exists:users,id'],
             'due_date' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
         ];
     }

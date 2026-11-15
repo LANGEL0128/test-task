@@ -17,7 +17,7 @@ use OpenApi\Attributes as OA;
     schema: 'Assignee',
     nullable: true,
     properties: [
-        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'id', type: 'string', format: 'uuid', example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b'),
         new OA\Property(property: 'name', type: 'string', example: 'Super Admin'),
         new OA\Property(property: 'email', type: 'string', format: 'email', example: 'admin@admin.com'),
     ],
@@ -25,11 +25,11 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'Task',
     properties: [
-        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'id', type: 'string', format: 'uuid', example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b'),
         new OA\Property(property: 'title', type: 'string', example: 'Preparar informe mensual'),
         new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Incluir métricas del último mes'),
         new OA\Property(property: 'status', type: 'string', enum: ['pendiente', 'en_curso', 'hecha'], example: 'pendiente'),
-        new OA\Property(property: 'assigned_to', type: 'integer', nullable: true, example: 1),
+        new OA\Property(property: 'assigned_to', type: 'string', format: 'uuid', nullable: true, example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b'),
         new OA\Property(property: 'assignee', ref: '#/components/schemas/Assignee'),
         new OA\Property(property: 'due_date', type: 'string', format: 'date', nullable: true, example: '2026-12-31'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
@@ -72,7 +72,7 @@ class TaskController extends Controller
         tags: ['Tareas'],
         parameters: [
             new OA\Parameter(name: 'status', in: 'query', required: false, description: 'Filtrar por estado', schema: new OA\Schema(type: 'string', enum: ['pendiente', 'en_curso', 'hecha'])),
-            new OA\Parameter(name: 'assigned_to', in: 'query', required: false, description: 'Filtrar por id del responsable', schema: new OA\Schema(type: 'integer', example: 1)),
+            new OA\Parameter(name: 'assigned_to', in: 'query', required: false, description: 'Filtrar por UUID del responsable', schema: new OA\Schema(type: 'string', format: 'uuid')),
             new OA\Parameter(name: 'per_page', in: 'query', required: false, description: 'Tareas por página (1-100, por defecto 15)', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100, default: 15)),
             new OA\Parameter(name: 'page', in: 'query', required: false, description: 'Número de página', schema: new OA\Schema(type: 'integer', minimum: 1, default: 1)),
         ],
@@ -101,7 +101,7 @@ class TaskController extends Controller
         summary: 'Ver una tarea (público)',
         tags: ['Tareas'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'Id de la tarea', schema: new OA\Schema(type: 'integer', example: 1)),
+            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'UUID de la tarea', schema: new OA\Schema(type: 'string', format: 'uuid', example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b')),
         ],
         responses: [
             new OA\Response(
@@ -109,7 +109,7 @@ class TaskController extends Controller
                 description: 'Tarea encontrada',
                 content: new OA\JsonContent(properties: [new OA\Property(property: 'data', ref: '#/components/schemas/Task')]),
             ),
-            new OA\Response(response: 400, description: 'Id no numérico', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
+            new OA\Response(response: 400, description: 'Id que no es un UUID válido', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 404, description: 'Tarea no encontrada', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
         ],
     )]
@@ -131,7 +131,7 @@ class TaskController extends Controller
                     new OA\Property(property: 'title', type: 'string', maxLength: 255, example: 'Preparar informe mensual'),
                     new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Incluir métricas del último mes'),
                     new OA\Property(property: 'status', type: 'string', enum: ['pendiente', 'en_curso', 'hecha'], default: 'pendiente'),
-                    new OA\Property(property: 'assigned_to', type: 'integer', nullable: true, description: 'Id del usuario responsable', example: 1),
+                    new OA\Property(property: 'assigned_to', type: 'string', format: 'uuid', nullable: true, description: 'UUID del usuario responsable', example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b'),
                     new OA\Property(property: 'due_date', type: 'string', format: 'date', nullable: true, description: 'Formato Y-m-d', example: '2026-12-31'),
                 ],
             ),
@@ -163,7 +163,7 @@ class TaskController extends Controller
         security: [['bearerAuth' => []]],
         tags: ['Tareas'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'Id de la tarea', schema: new OA\Schema(type: 'integer', example: 1)),
+            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'UUID de la tarea', schema: new OA\Schema(type: 'string', format: 'uuid', example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b')),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -172,7 +172,7 @@ class TaskController extends Controller
                     new OA\Property(property: 'title', type: 'string', maxLength: 255, example: 'Título editado'),
                     new OA\Property(property: 'description', type: 'string', nullable: true),
                     new OA\Property(property: 'status', type: 'string', enum: ['pendiente', 'en_curso', 'hecha'], example: 'en_curso'),
-                    new OA\Property(property: 'assigned_to', type: 'integer', nullable: true, example: 1),
+                    new OA\Property(property: 'assigned_to', type: 'string', format: 'uuid', nullable: true, example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b'),
                     new OA\Property(property: 'due_date', type: 'string', format: 'date', nullable: true, example: '2027-01-15'),
                 ],
             ),
@@ -183,7 +183,7 @@ class TaskController extends Controller
                 description: 'Tarea actualizada',
                 content: new OA\JsonContent(properties: [new OA\Property(property: 'data', ref: '#/components/schemas/Task')]),
             ),
-            new OA\Response(response: 400, description: 'Id no numérico o JSON mal formado', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
+            new OA\Response(response: 400, description: 'Id que no es un UUID válido o JSON mal formado', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 401, description: 'No autenticado', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 403, description: 'Sin rol super_admin', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 404, description: 'Tarea no encontrada', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
@@ -196,7 +196,7 @@ class TaskController extends Controller
         security: [['bearerAuth' => []]],
         tags: ['Tareas'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'Id de la tarea', schema: new OA\Schema(type: 'integer', example: 1)),
+            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'UUID de la tarea', schema: new OA\Schema(type: 'string', format: 'uuid', example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b')),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -205,7 +205,7 @@ class TaskController extends Controller
                     new OA\Property(property: 'title', type: 'string', maxLength: 255),
                     new OA\Property(property: 'description', type: 'string', nullable: true),
                     new OA\Property(property: 'status', type: 'string', enum: ['pendiente', 'en_curso', 'hecha'], example: 'hecha'),
-                    new OA\Property(property: 'assigned_to', type: 'integer', nullable: true),
+                    new OA\Property(property: 'assigned_to', type: 'string', format: 'uuid', nullable: true),
                     new OA\Property(property: 'due_date', type: 'string', format: 'date', nullable: true),
                 ],
             ),
@@ -216,7 +216,7 @@ class TaskController extends Controller
                 description: 'Tarea actualizada',
                 content: new OA\JsonContent(properties: [new OA\Property(property: 'data', ref: '#/components/schemas/Task')]),
             ),
-            new OA\Response(response: 400, description: 'Id no numérico o JSON mal formado', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
+            new OA\Response(response: 400, description: 'Id que no es un UUID válido o JSON mal formado', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 401, description: 'No autenticado', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 403, description: 'Sin rol super_admin', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 404, description: 'Tarea no encontrada', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
@@ -236,11 +236,11 @@ class TaskController extends Controller
         security: [['bearerAuth' => []]],
         tags: ['Tareas'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'Id de la tarea', schema: new OA\Schema(type: 'integer', example: 1)),
+            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'UUID de la tarea', schema: new OA\Schema(type: 'string', format: 'uuid', example: '0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b')),
         ],
         responses: [
             new OA\Response(response: 204, description: 'Tarea borrada (sin contenido)'),
-            new OA\Response(response: 400, description: 'Id no numérico', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
+            new OA\Response(response: 400, description: 'Id que no es un UUID válido', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 401, description: 'No autenticado', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 403, description: 'Sin rol super_admin', content: new OA\JsonContent(ref: '#/components/schemas/Message')),
             new OA\Response(response: 404, description: 'Tarea no encontrada', content: new OA\JsonContent(ref: '#/components/schemas/Message')),

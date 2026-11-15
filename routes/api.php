@@ -4,12 +4,13 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TaskController;
 use App\Models\Task;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-// Un id no numérico es una petición incorrecta (400); uno numérico inexistente es 404.
+// Un id que no es un UUID es una petición incorrecta (400); un UUID inexistente es 404.
 Route::bind('task', function (string $value) {
-    if (! ctype_digit($value)) {
-        throw new BadRequestHttpException('El identificador de la tarea debe ser numérico.');
+    if (! Str::isUuid($value)) {
+        throw new BadRequestHttpException('El identificador de la tarea debe ser un UUID válido.');
     }
 
     return Task::findOrFail($value);

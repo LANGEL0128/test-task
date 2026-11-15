@@ -116,8 +116,9 @@ class IndexTaskTest extends TestCase
     {
         return [
             'status desconocido' => ['status=terminada', 'status'],
-            'assigned_to no numerico' => ['assigned_to=abc', 'assigned_to'],
-            'assigned_to inexistente' => ['assigned_to=99999', 'assigned_to'],
+            'assigned_to que no es uuid' => ['assigned_to=abc', 'assigned_to'],
+            'assigned_to numerico (ya no se acepta)' => ['assigned_to=1', 'assigned_to'],
+            'assigned_to inexistente' => ['assigned_to='.'0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b', 'assigned_to'],
             'per_page cero' => ['per_page=0', 'per_page'],
             'per_page mayor a 100' => ['per_page=101', 'per_page'],
             'per_page no numerico' => ['per_page=muchos', 'per_page'],
