@@ -200,6 +200,590 @@
                     }
                 ]
             }
+        },
+        "/api/tasks": {
+            "get": {
+                "tags": [
+                    "Tareas"
+                ],
+                "summary": "Listar tareas (público) con filtros y paginación",
+                "operationId": "be68905d866e856db6c738172b8d929a",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pendiente",
+                                "en_curso",
+                                "hecha"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "assigned_to",
+                        "in": "query",
+                        "description": "Filtrar por id del responsable",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Tareas por página (1-100, por defecto 15)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de tareas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TaskPaginated"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Filtros inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Tareas"
+                ],
+                "summary": "Crear una tarea (solo super_admin)",
+                "operationId": "ebbaabc58e3db61374a57c53544959b2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Preparar informe mensual",
+                                        "maxLength": 255
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Incluir métricas del último mes",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "default": "pendiente",
+                                        "enum": [
+                                            "pendiente",
+                                            "en_curso",
+                                            "hecha"
+                                        ]
+                                    },
+                                    "assigned_to": {
+                                        "description": "Id del usuario responsable",
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "due_date": {
+                                        "description": "Formato Y-m-d",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-12-31",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tarea creada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Task"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "JSON mal formado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin rol super_admin",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/tasks/{id}": {
+            "get": {
+                "tags": [
+                    "Tareas"
+                ],
+                "summary": "Ver una tarea (público)",
+                "operationId": "32c40e2d1129b80c1dcabd538df63a33",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id de la tarea",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tarea encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Task"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Id no numérico",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tarea no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Tareas"
+                ],
+                "summary": "Editar una tarea (solo super_admin). PATCH acepta los mismos campos",
+                "operationId": "c36c959b634c99e1e02ad2f3f2c36a2c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id de la tarea",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Título editado",
+                                        "maxLength": 255
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "en_curso",
+                                        "enum": [
+                                            "pendiente",
+                                            "en_curso",
+                                            "hecha"
+                                        ]
+                                    },
+                                    "assigned_to": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2027-01-15",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tarea actualizada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Task"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Id no numérico o JSON mal formado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin rol super_admin",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tarea no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Tareas"
+                ],
+                "summary": "Borrar una tarea (solo super_admin)",
+                "operationId": "d81cc7975ea62176b4ef8f74ed95168d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id de la tarea",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Tarea borrada (sin contenido)"
+                    },
+                    "400": {
+                        "description": "Id no numérico",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin rol super_admin",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tarea no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Tareas"
+                ],
+                "summary": "Editar parcialmente una tarea (solo super_admin)",
+                "operationId": "45c4ee8c6fbf4c013b04823a0c105379",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id de la tarea",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "hecha",
+                                        "enum": [
+                                            "pendiente",
+                                            "en_curso",
+                                            "hecha"
+                                        ]
+                                    },
+                                    "assigned_to": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tarea actualizada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Task"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Id no numérico o JSON mal formado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin rol super_admin",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tarea no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -273,6 +857,137 @@
                     }
                 },
                 "type": "object"
+            },
+            "Assignee": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Super Admin"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "admin@admin.com"
+                    }
+                },
+                "type": "object",
+                "nullable": true
+            },
+            "Task": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Preparar informe mensual"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Incluir métricas del último mes",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "pendiente",
+                        "enum": [
+                            "pendiente",
+                            "en_curso",
+                            "hecha"
+                        ]
+                    },
+                    "assigned_to": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "assignee": {
+                        "$ref": "#/components/schemas/Assignee"
+                    },
+                    "due_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-12-31",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "TaskPaginated": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Task"
+                        }
+                    },
+                    "links": {
+                        "properties": {
+                            "first": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "last": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "prev": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "next": {
+                                "type": "string",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "meta": {
+                        "properties": {
+                            "current_page": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "from": {
+                                "type": "integer",
+                                "example": 1,
+                                "nullable": true
+                            },
+                            "last_page": {
+                                "type": "integer",
+                                "example": 3
+                            },
+                            "per_page": {
+                                "type": "integer",
+                                "example": 15
+                            },
+                            "to": {
+                                "type": "integer",
+                                "example": 15,
+                                "nullable": true
+                            },
+                            "total": {
+                                "type": "integer",
+                                "example": 40
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -288,6 +1003,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Tareas",
+            "description": "Tareas"
         }
     ]
 }
